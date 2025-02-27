@@ -13,14 +13,14 @@ Before running this project, ensure you have:
 - **Node.js** (v18 or above) installed. [Download here](https://nodejs.org/)
 - **npm** (comes with Node.js) or **yarn** for package management.
 - **Metamask** installed and configured for the **Sepolia Testnet**.
-- **Infura or Alchemy API key** to connect to Ethereum networks.
+- **Infura or Alchemy API key** to connect to Ethereum networks. (No need. Bibek has provided think Infura endpoint URL.)
 
 ---
 
 ### **2️⃣ Clone the Repository**
 ```bash
-git clone https://github.com/yourusername/GoldByte.git
-cd GoldByte
+git https://github.com/BibekLakra91/BharatBytes
+cd BharatBytes
 ```
 
 ---
