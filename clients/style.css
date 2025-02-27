@@ -1,0 +1,27 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f2f5;
+    margin: 20px;
+}
+
+h1 {
+    color: #333;
+}
+
+#app {
+    margin-top: 20px;
+}
+
+button {
+    margin: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+pre {
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-top: 20px;
+}

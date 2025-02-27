@@ -1,0 +1,27 @@
+{
+  "name": "goldbyte",
+  "version": "1.0.0",
+  "description": "GoldByte: A scalable, gold-backed cross-border payment system on Polygon",
+  "scripts": {
+    "deploy:mumbai": "cross-env MUMBAI_RPC_URL=$MUMBAI_RPC_URL PRIVATE_KEY=$PRIVATE_KEY npx hardhat run scripts/deploy.js --network mumbai",
+    "compile": "npx hardhat compile",
+    "test": "npx hardhat test",
+    "deploy": "npx hardhat run scripts/deploy.js --network localhost",
+    "start:server": "cd server && npm start",
+    "start:client": "cd client && npx http-server -p 8000",
+    "start:local": "npx hardhat node"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.8.0",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.4.7",
+    "ganache": "^7.9.0"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@nomicfoundation/hardhat-verify": "^2.0.13",
+    "ethers": "^6.13.5",
+    "hardhat": "^2.22.19",
+    "http-server": "^14.1.1"
+  }
+}
