@@ -19,7 +19,7 @@ Before running this project, ensure you have:
 
 ### **2️⃣ Clone the Repository**
 ```bash
-git https://github.com/BibekLakra91/BharatBytes
+git clone https://github.com/BibekLakra91/BharatBytes
 cd BharatBytes
 ```
 
@@ -90,7 +90,14 @@ npx hardhat run scripts/deploy.js --network sepolia
 
 ---
 
-### **7️⃣ Mint GoldByte Tokens to Your Wallet**
+### **7️⃣ Check Your GoldByte Balance**
+```bash
+npx hardhat run scripts/checkBalance.js --network sepolia
+```
+This retrieves your token balance.
+
+---
+### **8️⃣ Mint GoldByte Tokens to Your Wallet**
 ```bash
 npx hardhat run scripts/mintTokens.js --network sepolia
 ```
@@ -98,13 +105,6 @@ This script generates tokens into your wallet.
 
 ---
 
-### **8️⃣ Check Your GoldByte Balance**
-```bash
-npx hardhat run scripts/checkBalance.js --network sepolia
-```
-This retrieves your token balance.
-
----
 
 ### **9️⃣ Transfer GoldByte Tokens**
 ```bash

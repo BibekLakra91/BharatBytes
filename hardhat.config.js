@@ -9,7 +9,7 @@ module.exports = {
     sepolia: {
       url: process.env.SEPOLIA_RPC_URL || "",  // Infura RPC for Sepolia
       chainId: 11155111, // Sepolia Testnet Chain ID
-      accounts: process.env.PRIVATE_KEY ? [`0x${process.env.PRIVATE_KEY}`] : [],
+      accounts: process.env.PRIVATE_KEY ? [`${process.env.PRIVATE_KEY}`] : [],
     },
   },
   // etherscan: {
