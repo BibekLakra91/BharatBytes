@@ -1,158 +1,136 @@
 
 ---
 
-## **🚀 GoldByte - Tokenized Gold on Blockchain**
-GoldByte is a **gold-backed** digital currency deployed on **Ethereum Sepolia Testnet**, designed for **fast, low-cost, and scalable** cross-border transactions.
+# **GoldByte - Tokenized Gold with Bank Settlements**
+
+**GoldByte** is an ERC‑20 token (1 GB = 1 gram of gold) that allows **registered banks** to issue tokens and users to redeem tokens at a chosen bank. The contract tracks obligations (settlements) between banks whenever redemptions occur, making it easy to see which bank owes gold to another bank.
+
+## **Features**
+
+1. **Bank Registration**  
+   - Banks are identified by a **bank code** (e.g., `"LBG"`).  
+   - The IMF (contract owner) calls `updateRegisteredBank(bankCode, bankAddress)` to register a bank.
+
+2. **Issuance**  
+   - A **registered bank** can issue tokens to any user by calling `issueTokens(...)`.  
+   - The bank specifies:
+     - Recipient’s address  
+     - Amount of tokens to issue  
+     - Issuer bank code (e.g., `"LBG"`)  
+     - Recipient’s bank code (e.g., `"SBI"`)  
+   - The contract increases the `lockedGoldReserves` by the amount of tokens issued.
+
+3. **Transfers**  
+   - Standard ERC‑20 transfers are allowed.  
+   - If the recipient doesn’t have an associated bank, the issuance info is copied from the sender.
+
+4. **Redemption**  
+   - Any user can redeem tokens at any **registered** bank by calling `redeem(amount, chosenRedeemingBank)`.  
+   - The contract:
+     - Burns the user’s tokens.  
+     - Reduces `lockedGoldReserves` by the redeemed amount.  
+     - Updates `netSettlements[issuerBank][chosenRedeemingBank]` to reflect that the issuer bank owes the chosen redeeming bank.
+
+5. **Settlement Tracking**  
+   - The mapping `netSettlements[bankA][bankB]` is an `int256` that shows how much `bankA` owes `bankB`.  
+   - If this value is positive, bankA owes bankB.  
+   - If it’s negative, bankB actually owes bankA.  
+   - The function `_settleRedemption` automatically nets out reverse obligations.
+
+6. **Auto-Settlement**  
+   - If a user holds tokens longer than `HOLDING_LIMIT` (e.g., 5 days), anyone can call `autoSettle(userAddress)`.  
+   - The contract tries to transfer tokens to the user’s associated bank’s wallet. If that fails, it tries to send them to the issuer’s wallet. If both fail, it burns them.
+
+7. **Dashboard & View Functions**  
+   - `bankDashboard()`: For a bank wallet to see its own token balance and a net settlement report with all other banks.  
+   - `userDashboard()`: For a non-bank wallet to see its token balance and redeemable balance.  
+   - `getBankCodes()`: Lists all registered banks.  
+   - `getGoldReserve()`: Returns the global locked gold reserve (in tokens).
 
 ---
 
-## **📌 Project Setup**
+## **Key Contract Functions**
 
-### **1️⃣ Prerequisites**
-Before running this project, ensure you have:
-- **Node.js** (v18 or above) installed. [Download here](https://nodejs.org/)
-- **npm** (comes with Node.js) or **yarn** for package management.
-- **Metamask** installed and configured for the **Sepolia Testnet**.
-- **Infura or Alchemy API key** to connect to Ethereum networks. (No need. Bibek has provided think Infura endpoint URL.)
+1. **`updateRegisteredBank(string bankCode, address bankAddress) external onlyOwner`**  
+   - Registers or updates a bank code to a specific wallet address.  
+   - Only callable by the IMF (contract owner).
 
----
+2. **`issueTokens(address account, uint256 amount, string issuerBank, string accountAffiliation) external`**  
+   - A registered bank (caller) mints new tokens and increases `lockedGoldReserves`.  
+   - The user’s bank affiliation is set if not already present.
 
-### **2️⃣ Clone the Repository**
-```bash
-git clone https://github.com/BibekLakra91/BharatBytes
-cd BharatBytes
-```
+3. **`redeem(uint256 amount, string chosenRedeemingBank) external`**  
+   - Burns `amount` of tokens from the caller.  
+   - Ensures `chosenRedeemingBank` is registered.  
+   - Updates settlement so that `issuerBank` owes `chosenRedeemingBank`.
 
----
+4. **`autoSettle(address account) external`**  
+   - If the account has held tokens beyond `HOLDING_LIMIT`, tries to transfer them to the account’s bank wallet or the issuer’s wallet.  
+   - If both fail, burns them.
 
-### **3️⃣ Install Dependencies**
-Run the following command to install all required dependencies:
-```bash
-npm install
-```
+5. **`bankDashboard()`**  
+   - Returns `(tokenBalance, counterparties[], debts[])` for the calling bank wallet.  
+   - Shows how much this bank owes or is owed by each other bank.
 
-This installs:
-- **Hardhat** (for development & testing)
-- **Ethers.js (v6)** (for interacting with smart contracts)
-- **Dotenv** (for managing environment variables)
+6. **`userDashboard()`**  
+   - For non-bank wallets.  
+   - Returns `(tokenBalance, redeemableBalance)`.
 
----
+7. **`netSettlements(string bankA, string bankB) public view returns (int256)`**  
+   - Shows how much `bankA` owes `bankB`.  
+   - Positive = bankA owes bankB; negative = bankB owes bankA.
 
-## **📂 Project Structure**
-```
-├── contracts/            # Contains Solidity smart contracts
-│   ├── GoldByte.sol      # Main GoldByte ERC-20 smart contract
-├── scripts/              # Automation scripts for deployment & interaction
-│   ├── deploy.js         # Deploys GoldByte contract to Sepolia
-│   ├── checkBalance.js   # Checks token balance of a wallet
-│   ├── transferTokens.js # Transfers GoldByte tokens to a recipient
-├── test/                 # Unit tests for smart contracts
-│   ├── GoldByte-test.js  # Test cases for GoldByte contract
-├── .env                  # Environment variables (NEVER share this!)
-├── hardhat.config.js      # Hardhat configuration file
-├── package.json          # Project dependencies and scripts
-├── README.md             # This guide
-```
+8. **`getBankCodes()`**  
+   - Lists all registered bank codes.
+
+9. **`getGoldReserve()`**  
+   - Returns the total locked gold reserve in tokens.
 
 ---
 
-## **⚙️ Configuration**
+## **Scripts**
 
-### **4️⃣ Set Up Environment Variables**
-Create a `.env` file in the root directory and add the following:
-```plaintext
-SEPOLIA_RPC_URL=https://sepolia.infura.io/v3/1f1d731ab36c4dbe9f3134aae160b5a6
-PRIVATE_KEY=<YOUR_WALLET_PRIVATE_KEY_WITHOUT 0x>
-GOLDBYTE_CONTRACT=<YourGoldByteContractAddress>
-RECEIVER_WALLET=<ReceiverAddress>
-```
-- **`PRIVATE_KEY`** → Your Ethereum wallet **private key** (⚠️ **NEVER** share this!).
-- **`GOLDBYTE_CONTRACT`** → **Fill this after deployment**.
-- **`RECEIVER_WALLET`** → Address to receive GoldByte tokens.
+### **Issuance Script: `issueToken.js`**
+- Connects as a **bank** wallet (with `BANK_PRIVATE_KEY`).  
+- Calls `issueTokens(...)` to mint new tokens for a recipient.  
+- Increases the global locked gold reserve.
 
----
+### **Redemption Script: `redeem.js`**
+- A user (or any wallet) calls `redeem(amount, chosenRedeemingBank)`.  
+- The script checks user’s balance, ensures the chosen bank is registered, then calls `redeem(...)`.  
+- After redemption, tokens are burned, `lockedGoldReserves` is reduced, and settlement is updated so that the issuer owes the chosen bank.
 
-## **🛠️ How to Use**
-
-### **5️⃣ Compile the Smart Contracts**
-```bash
-npx hardhat compile
-```
-This ensures the smart contract code is correct.
+### **Settlement Report Script: `settlement.js`**
+- Fetches the list of registered banks (`getBankCodes()`).  
+- Calls `netSettlements(bankA, bankB)` for each pair of banks.  
+- Prints a human‑readable settlement report, showing how much each bank owes the other.
 
 ---
 
-### **6️⃣ Deploy GoldByte Contract**
-```bash
-npx hardhat run scripts/deploy.js --network sepolia
-```
-- Once deployed, **copy the contract address** and update `GOLDBYTE_CONTRACT` in your `.env` file.
+## **Hackathon Flow Example**
+
+1. **Bank LBG Registers**  
+   - IMF calls `updateRegisteredBank("LBG", lbgWalletAddress)`.
+
+2. **Bank LBG Issues 100 GB to User A**  
+   - LBG calls `issueTokens(userA, 100e18, "LBG", "LBG")`.  
+   - `lockedGoldReserves` increases by 100.  
+   - User A can see 100 tokens in `balanceOf(userA)`.
+
+3. **User A Transfers 10 GB to User B**  
+   - Standard ERC‑20 `transfer`.  
+   - If user B had no bank affiliation, the contract copies the issuance info from user A.
+
+4. **User B Redeems 10 GB at SBI**  
+   - B calls `redeem(10e18, "SBI")`.  
+   - The contract checks that `"SBI"` is registered, then updates `netSettlements("LBG","SBI") += 10`, burns tokens, and reduces `lockedGoldReserves` to 90.  
+   - Now LBG effectively owes SBI 10 tokens.
+
+5. **Check Settlements**  
+   - Running `settlement.js` reveals `Bank LBG owes Bank SBI: 10.0 tokens`.
 
 ---
 
-### **7️⃣ Check Your GoldByte Balance**
-```bash
-npx hardhat run scripts/checkBalance.js --network sepolia
-```
-This retrieves your token balance.
+## **Conclusion**
 
----
-### **8️⃣ Mint GoldByte Tokens to Your Wallet**
-```bash
-npx hardhat run scripts/issueTokens.js --network sepolia
-```
-This script generates tokens into your wallet.
-
----
-
-
-### **9️⃣ Transfer GoldByte Tokens**
-```bash
-npx hardhat run scripts/transferTokens.js --network sepolia
-```
-This sends **10 GoldByte (GB)** to the receiver wallet.
-
----
-
-## **🧪 Running Tests**
-```bash
-npx hardhat test
-```
-This runs all test cases inside the **`test/`** directory.
-
----
-
-## **🚀 Adding GoldByte to MetaMask**
-To see **GoldByte (GB) tokens** in MetaMask:
-1. Open **MetaMask**.
-2. Select the **Sepolia Testnet**.
-3. Click **"Import Token"**.
-4. Enter the **GoldByte Contract Address**.
-5. Click **"Add Custom Token"** → Done!
-
----
-
-## **🛡️ Security Notes**
-- **Never share your private key** or expose your `.env` file in a public repository.
-- **Only use test accounts** while developing on Sepolia.
-
----
-
-## **💡 Additional Information**
-- **Hardhat Docs**: [https://hardhat.org](https://hardhat.org)
-- **Ethers.js Docs**: [https://docs.ethers.io](https://docs.ethers.io)
-- **Infura**: [https://infura.io](https://infura.io)
-- **MetaMask**: [https://metamask.io](https://metamask.io)
-
----
-
-## **💬 Need Help?**
-If you encounter any issues:
-- Check the **error messages** and make sure your `.env` variables are correct.
-- Make sure your **Sepolia wallet has ETH** for gas fees (use a **Sepolia Faucet**).
-- Post an issue on **GitHub** or discuss in a **developer forum**.
-
----
-### ✅ **GoldByte - Bringing Gold to the Blockchain!**
----
-This `README.md` file provides **everything** a developer needs to **run, deploy, and interact** with your project. Let me know if you want any changes! 🚀
+**GoldByte** provides a secure, on‑chain solution for tokenizing gold, allowing **registered banks** to issue tokens, and users to redeem at any bank. The contract automatically handles **bank settlements** through a net obligations mapping, simplifying cross‑bank operations and ensuring a clear record of who owes what in tokenized gold.
