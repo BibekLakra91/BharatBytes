@@ -7,9 +7,10 @@ module.exports = {
   solidity: "0.8.17",
   networks: {
     sepolia: {
-      url: process.env.SEPOLIA_RPC_URL || "",  // Infura RPC for Sepolia
+      url: process.env.IMF_RPC_URL  || "",  // Infura RPC for Sepolia
       chainId: 11155111, // Sepolia Testnet Chain ID
-      accounts: process.env.PRIVATE_KEY ? [`${process.env.PRIVATE_KEY}`] : [],
+      accounts: process.env.IMF_PRIVATE_KEY ? [`0x${process.env.IMF_PRIVATE_KEY}`] : [],
+      // accounts: process.env.SENDER_PRIVATE_KEY ? [`0x${process.env.SENDER_PRIVATE_KEY}`] : [],
     },
   },
   // etherscan: {

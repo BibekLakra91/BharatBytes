@@ -99,7 +99,7 @@ This retrieves your token balance.
 ---
 ### **8️⃣ Mint GoldByte Tokens to Your Wallet**
 ```bash
-npx hardhat run scripts/mintTokens.js --network sepolia
+npx hardhat run scripts/issueTokens.js --network sepolia
 ```
 This script generates tokens into your wallet.
 

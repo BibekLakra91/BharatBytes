@@ -3,13 +3,13 @@ const { ethers } = require("ethers");
 
 async function main() {
   // 1. Load environment variables
-  const rpcUrl = process.env.SEPOLIA_RPC_URL;
-  const privateKey = process.env.PRIVATE_KEY;
+  const rpcUrl = process.env.IMF_RPC_URL;
+  const privateKey = process.env.SENDER_PRIVATE_KEY;
   const contractAddress = process.env.GOLDBYTE_CONTRACT;
   const receiver = process.env.RECEIVER_WALLET;
 
   if (!rpcUrl || !privateKey || !contractAddress || !receiver) {
-    throw new Error("Missing environment variables in .env (SEPOLIA_RPC_URL, PRIVATE_KEY, GOLDBYTE_CONTRACT, RECEIVER_WALLET).");
+    throw new Error("Missing environment variables in .env (IMF_RPC_URL, SENDER_PRIVATE_KEY, GOLDBYTE_CONTRACT, RECEIVER_WALLET).");
   }
 
   // 2. Create a provider (Ethers v6 syntax)
@@ -34,7 +34,7 @@ async function main() {
   const goldByte = new ethers.Contract(contractAddress, goldByteABI, wallet);
 
   // 6. Define the token amount to transfer (10 tokens, assuming 18 decimals)
-  const amount = ethers.parseUnits("10", 18);
+  const amount = ethers.parseUnits("30", 18);
 
   console.log(`\nTransferring 10 tokens from ${wallet.address} to ${receiver}...`);
   const tx = await goldByte.transfer(receiver, amount);
