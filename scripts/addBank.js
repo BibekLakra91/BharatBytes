@@ -22,10 +22,10 @@ async function main() {
 
   // 4. Update a bank's public wallet address and bank code.
   // For example, update bank code "SBI" with its wallet address.
-  const bankCode = "SBI";
-  const bankWalletAddress = "0x8f48A6327E9669AEA9855fC52723CeAF8993e21A"; // Replace with the correct address
-  // const bankCode = "LBG";
-  // const bankWalletAddress = "0xA3413B421058ed8b0AfC04d21E6D489E9b6Dc621"; // Replace with the correct address
+  // const bankCode = "SBI";
+  // const bankWalletAddress = "0x8f48A6327E9669AEA9855fC52723CeAF8993e21A"; // Replace with the correct address
+  const bankCode = "LBG";
+  const bankWalletAddress = "0xA3413B421058ed8b0AfC04d21E6D489E9b6Dc621"; // Replace with the correct address
   console.log(`Updating bank registration for ${bankCode} to wallet address ${bankWalletAddress}...`);
   const updateTx = await goldByte.updateRegisteredBank(bankCode, bankWalletAddress);
   await updateTx.wait();

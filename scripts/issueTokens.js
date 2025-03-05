@@ -21,7 +21,7 @@ async function main() {
 
   // 4. Define issuance parameters.
   //    If RECEIVER_WALLET is not provided, the bank issues tokens to its own wallet.
-  const mintTo = process.env.RECEIVER_WALLET || signer.address;
+  const mintTo = process.env.ISUUE_RECEIVER_WALLET || signer.address;
   const amount = "100"; // 100 GB tokens (each token represents 1 gram of gold)
   const decimals = 18;
   const parsedAmount = ethers.parseUnits(amount, decimals);
@@ -54,7 +54,7 @@ async function main() {
 
   // 8. If issuing to self, print active GoldByte issued by this bank.
   if (mintTo.toLowerCase() === signer.address.toLowerCase()) {
-    console.log(`🏦 Active GoldByte issued by bank ${issuerBank}: ${ethers.formatUnits(tokenBalance, 18)} grams`);
+    console.log(`🏦 Active GoldByte issued by bank ${issuerBank}: ${ethers.formatUnits(tokenBalance, 18)} unit`);
   }
 }
 
